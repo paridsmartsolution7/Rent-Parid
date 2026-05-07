@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(taskkill:*)",
+      "Bash(cmd:*)",
+      "Bash(curl:*)",
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git rm:*)",
+      "Bash(rm -rf client/.git)",
+      "Bash(gh auth:*)",
+      "Bash(git push:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(rm:*)",
+      "Bash(node:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git config *)",
+      "Bash(npx next *)"
+    ]
+  }
+}
