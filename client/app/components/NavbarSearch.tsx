@@ -113,7 +113,7 @@ export default function NavbarSearch({ open, onClose, primaryColor }: Props) {
       className="fixed inset-0 z-50 flex items-start justify-center"
       role="dialog"
       aria-modal="true"
-      aria-label="Kerko produkte"
+      aria-label="Kerko makina"
     >
       {/* Backdrop */}
       <button
@@ -132,7 +132,7 @@ export default function NavbarSearch({ open, onClose, primaryColor }: Props) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Kerko artikuj..."
+            placeholder="Kerko makina..."
             className="flex-1 bg-transparent outline-none text-base text-gray-900 placeholder-gray-400"
             autoComplete="off"
           />
@@ -156,7 +156,7 @@ export default function NavbarSearch({ open, onClose, primaryColor }: Props) {
             <div className="px-4 py-8 text-center text-sm text-gray-500">Duke kerkuar...</div>
           ) : hasSearched && results.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-gray-500">
-              Asnje artikull nuk u gjet per &quot;{query}&quot;
+              Asnje makine nuk u gjet per &quot;{query}&quot;
             </div>
           ) : (
             <ul className="divide-y divide-gray-100">

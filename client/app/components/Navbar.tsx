@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { ShoppingCart, X, Menu, Heart, User, LogOut, Search } from "lucide-react";
+import { X, Menu, Heart, User, LogOut, Search } from "lucide-react";
 import UserMenu from "./UserMenu";
 import NavbarSearch from "./NavbarSearch";
 import {
@@ -28,7 +28,7 @@ type NavbarProps = {
 
 const NAV_ITEMS = [
   { href: '/', label: 'Kryefaqja' },
-  { href: '/shop', label: 'Te gjitha' },
+  { href: '/shop', label: 'Makinat' },
   { href: '/deals', label: 'Oferta' },
   { href: '/blog', label: 'Blog' },
   { href: '/favorites', label: 'Te preferuarat' },
@@ -143,7 +143,7 @@ export default function Navbar({ config, cartCount, onCartOpen }: NavbarProps) {
               </svg>
             </div>
             <span className="text-sm sm:text-base md:text-lg font-extrabold tracking-tight text-gray-900">
-              {config?.company_name || 'PSS Shop'}
+              {config?.company_name || 'Rent Parid'}
             </span>
           </button>
 
@@ -175,20 +175,6 @@ export default function Navbar({ config, cartCount, onCartOpen }: NavbarProps) {
               className="w-10 h-10 flex items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 transition"
             >
               <Search size={20} strokeWidth={2.5} />
-            </button>
-
-            <button
-              onClick={onCartOpen}
-              className="relative flex items-center gap-1.5 sm:gap-2 text-white px-2.5 sm:px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
-              style={{ backgroundColor: primaryColor }}
-            >
-              <ShoppingCart size={16} strokeWidth={2.5} />
-              <span className="hidden sm:inline">{config?.cart_button_text || 'Shporta'}</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center ring-2 ring-white">
-                  {cartCount}
-                </span>
-              )}
             </button>
 
             {/* Desktop user menu */}

@@ -21,10 +21,10 @@ export default function Footer() {
                   <path d="M2151 2784 c-143 -50 -205 -209 -137 -347 63 -130 213 -174 346 -101 189 103 141 408 -71 453 -65 14 -85 13 -138 -5z"/>
                 </g>
               </svg>
-              <span className="text-xl font-bold text-gray-900">PSS Shop</span>
+              <span className="text-xl font-bold text-gray-900">Rent Parid</span>
             </div>
             <p className="text-sm leading-relaxed text-gray-400">
-              Destinacioni juaj i besuar per blerje online. Produkte cilesore, dergesa te shpejta dhe sherbim i shkellqyer.
+              Partneri juaj per qira makinash ne Shqiperi. Flota moderne, cmime te qarta dhe rezervim online ne pak klikime.
             </p>
           </div>
 
@@ -34,7 +34,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {[
                 { href: "/", label: "Kryefaqja" },
-                { href: "/shop", label: "Dyqani" },
+                { href: "/shop", label: "Makinat" },
                 { href: "/favorites", label: "Te preferuarat" },
                 { href: "/auth", label: "Llogaria ime" },
               ].map((link) => (
@@ -97,11 +97,11 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-gray-200 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-500">
-            &copy; {new Date().getFullYear()} PSS Shop. Te gjitha te drejtat e rezervuara.
+            &copy; {new Date().getFullYear()} Rent Parid. Te gjitha te drejtat e rezervuara.
           </p>
           <div className="flex items-center gap-4">
             <span className="text-xs text-gray-500">Mundesuar nga</span>
-            <span className="text-xs font-semibold" style={{ color: primaryColor }}>PSS Shop</span>
+            <span className="text-xs font-semibold" style={{ color: primaryColor }}>Rent Parid</span>
           </div>
         </div>
       </div>

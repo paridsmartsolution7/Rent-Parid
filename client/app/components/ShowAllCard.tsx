@@ -10,7 +10,7 @@ import Link from "next/link";
  */
 export default function ShowAllCard({
   href,
-  label = 'Te gjitha produktet',
+  label = 'Te gjitha makinat',
 }: {
   href: string;
   label?: string;

@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Ticket } from "lucide-react";
+import { Users, Briefcase, Settings2 } from "lucide-react";
 import HeartButton from "./HeartButton";
+import { getCarSpecs } from "../lib/carSpecs";
 
 type Product = {
   id: number;
@@ -104,13 +105,15 @@ export default function ProductCard({
   const offerPrice = hasOffer ? Number(product.offerPrice) : 0;
   const discount = hasOffer && product.discountPercent ? Number(product.discountPercent) : 0;
   const oos = product.stock <= 0;
+  const specs = getCarSpecs(product.id);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm flex flex-col overflow-hidden relative h-full">
-      {/* Top-left badges: ZBRITJE on offer, plus NEW / BESTSELLER flags driven
-          by the API's isNew / isBestseller computations. Multiple badges stack
-          vertically when more than one applies. */}
+      {/* Top-left badges: vehicle category (always) + offer/new/bestseller flags */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1 items-start">
+        <span className="bg-gray-900/85 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+          {specs.vehicleCategory}
+        </span>
         {hasOffer && discount > 0 && (
           <span className="bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
             -{discount}% Zbritje
@@ -118,12 +121,12 @@ export default function ProductCard({
         )}
         {Number(product.isNew) === 1 && (
           <span className="bg-[#1F3E76] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
-            I ri
+            Oferte e hershme
           </span>
         )}
         {Number(product.isBestseller) === 1 && (
           <span className="bg-purple-100 text-purple-700 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-            Bestseller
+            Zgjedhja e dites
           </span>
         )}
       </div>
@@ -167,29 +170,19 @@ export default function ProductCard({
       </Link>
 
       <div className="p-4 flex flex-col flex-1">
-        {/* Brand-like row (we use categoryName since product brand isn't in the schema) */}
-        <span className="text-xs text-gray-500 mb-1 truncate" title={product.categoryName}>
-          {product.categoryName}
-        </span>
-
         {/* Title */}
         <Link
           href={`/product/${product.id}`}
-          className="font-bold text-gray-900 text-base leading-snug mb-1 line-clamp-2 cursor-pointer min-h-[2.5rem]"
+          className="font-bold text-gray-900 text-base leading-snug mb-2 line-clamp-2 cursor-pointer min-h-[2.5rem]"
         >
           {product.name}
         </Link>
 
-        {/* Spec line — unit if available */}
-        {product.unit && product.unit.trim() && (
-          <span className="text-xs text-gray-500 mb-2">Njesia: {product.unit}</span>
-        )}
-
-        {/* Price + crossed-out — sits right above the button */}
-        <div className="mt-auto flex items-baseline gap-2 flex-wrap mb-3">
+        {/* Price /DITË + crossed-out + estimated weekly total */}
+        <div className="flex items-baseline gap-2 flex-wrap mb-1">
           {hasOffer ? (
             <>
-              <span className="text-xl sm:text-2xl font-extrabold text-red-600 leading-none">
+              <span className="text-2xl sm:text-3xl font-extrabold text-red-600 leading-none">
                 <CardPrice
                   amount={offerPrice}
                   currency={currencySymbol}
@@ -197,6 +190,7 @@ export default function ProductCard({
                   decimalsClassName="text-xs sm:text-sm font-bold align-top ml-0.5"
                 />
               </span>
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">/dite</span>
               <span className="text-sm text-gray-400 line-through">
                 <CardPrice
                   amount={product.price}
@@ -207,63 +201,61 @@ export default function ProductCard({
               </span>
             </>
           ) : (
-            <span className="text-xl sm:text-2xl font-extrabold text-gray-900 leading-none">
-              <CardPrice
-                amount={product.price}
-                currency={currencySymbol}
-                position={pricePosition}
-                decimalsClassName="text-xs sm:text-sm font-bold align-top ml-0.5"
-              />
-            </span>
+            <>
+              <span className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-none">
+                <CardPrice
+                  amount={product.price}
+                  currency={currencySymbol}
+                  position={pricePosition}
+                  decimalsClassName="text-xs sm:text-sm font-bold align-top ml-0.5"
+                />
+              </span>
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">/dite</span>
+            </>
           )}
         </div>
+        <div className="text-[11px] text-gray-500 mb-3">
+          <span className="font-semibold">{((hasOffer ? offerPrice : product.price) * 7).toFixed(0)} {currencySymbol}</span> totali per 7 dite · 1500 km i perfshire
+        </div>
 
-        {/* Full-width cart button — three states:
-              - OOS: disabled grey "Pa gjendje"
-              - In cart: solid green "Ticket Shtuar" — clicking removes it
-                from the cart in-place (toggle). Falls back to opening the
-                cart drawer if onRemoveFromCart isn't wired.
-              - Not in cart: dark "Shto ne shporte" */}
-        <button
-          onClick={() => {
-            if (oos) return;
-            if (isInCart) {
-              if (onRemoveFromCart) onRemoveFromCart(product.id);
-              else if (onCartOpen) onCartOpen();
-              return;
-            }
-            onAdd(product);
-          }}
-          aria-disabled={oos}
-          aria-pressed={!!isInCart}
-          title={isInCart ? 'Kliko per ta hequr nga shporta' : undefined}
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-          className={
-            'w-full text-white text-sm font-semibold py-2.5 rounded-full shadow-sm ' +
-            'inline-flex items-center justify-center gap-2 ' +
-            'whitespace-nowrap overflow-hidden text-ellipsis ' +
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F3E76] focus-visible:ring-offset-2 focus-visible:ring-offset-white ' +
-            (oos
-              ? 'opacity-40 cursor-not-allowed bg-gray-400'
-              : isInCart
-                ? 'bg-[#1F3E76]'
-                : 'bg-gray-900')
-          }
-        >
-          {oos ? (
-            'Pa gjendje'
-          ) : isInCart ? (
-            <>
-              <Ticket size={16} strokeWidth={2.5} />
-              Shtuar
-            </>
-          ) : (
-            'Shto ne shporte'
-          )}
-        </button>
+        {/* Spec pills — passengers, suitcases, transmission */}
+        <div className="flex flex-wrap items-center gap-1.5 mb-3">
+          <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-[11px] font-semibold">
+            <Users size={12} strokeWidth={2.5} />
+            {specs.seats}
+          </span>
+          <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-[11px] font-semibold">
+            <Briefcase size={12} strokeWidth={2.5} />
+            {specs.suitcases}
+          </span>
+          <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-[11px] font-semibold uppercase tracking-wider">
+            <Settings2 size={12} strokeWidth={2.5} />
+            {specs.transmission}
+          </span>
+        </div>
+
+        <div className="mt-auto" />
+
+        {oos ? (
+          <button
+            disabled
+            aria-disabled
+            className="w-full text-white text-sm font-semibold py-2.5 rounded-full shadow-sm inline-flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis opacity-40 cursor-not-allowed bg-gray-400"
+          >
+            E zene
+          </button>
+        ) : (
+          <Link
+            href={`/product/${product.id}`}
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+            className="w-full text-white text-sm font-semibold py-2.5 rounded-full shadow-sm inline-flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1F3E76] focus-visible:ring-offset-2 focus-visible:ring-offset-white bg-gray-900 hover:bg-[#1F3E76] transition-colors"
+          >
+            Rezervo tani
+          </Link>
+        )}
 
         {showStockWarning && product.stock <= 5 && product.stock > 0 && (
-          <p className="text-xs text-orange-500 mt-1">Vetem {product.stock} te mbetura!</p>
+          <p className="text-xs text-orange-500 mt-1">Vetem {product.stock} te disponueshme!</p>
         )}
       </div>
     </div>

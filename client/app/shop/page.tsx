@@ -1,14 +1,31 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, ChevronDown, ShoppingBag } from "lucide-react";
+import { Search, ChevronDown, Car, Truck, Caravan, Zap, Sun } from "lucide-react";
 import Navbar from "../components/Navbar";
-import CartDrawer from "../components/CartDrawer";
-import HeartButton from "../components/HeartButton";
 import ProductCard from "../components/ProductCardFixed";
 import { getFavorites, toggleFavorite as toggleFavoriteStorage, onFavoritesChanged } from "../lib/favorites";
 import { cachedFetch } from "../lib/clientCache";
+import {
+  VEHICLE_CATEGORIES,
+  TRANSMISSIONS,
+  FUEL_TYPES,
+  PRICE_BUCKETS,
+  getCarSpecs,
+  type VehicleCategory,
+  type Transmission,
+  type FuelType,
+} from "../lib/carSpecs";
+
+const CATEGORY_ICONS: Record<VehicleCategory, typeof Car> = {
+  Limuzine: Car,
+  SUV: Truck,
+  Kupe: Car,
+  Kabriolet: Sun,
+  Familjare: Caravan,
+  Elektrike: Zap,
+};
 
 type Product = {
   id: number;
@@ -83,11 +100,18 @@ function ShopPageInner() {
   const [sortBy, setSortBy] = useState("default");
   const [toast, setToast] = useState<string | null>(null);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, totalPages: 0 });
-  const [categories, setCategories] = useState<{ Kodi: string; Pershkrim: string }[]>([]);
-  const [category, setCategory] = useState("All");
   const [config, setConfig] = useState<Config | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set());
+
+  // Filter UI state
+  const [selectedPriceBuckets, setSelectedPriceBuckets] = useState<Set<string>>(new Set());
+  const [selectedCategories, setSelectedCategories] = useState<Set<VehicleCategory>>(new Set());
+  const [selectedTransmissions, setSelectedTransmissions] = useState<Set<Transmission>>(new Set());
+  const [selectedFuels, setSelectedFuels] = useState<Set<FuelType>>(new Set());
+  const [priceOpen, setPriceOpen] = useState(true);
   const [catOpen, setCatOpen] = useState(true);
+  const [gearOpen, setGearOpen] = useState(true);
+  const [fuelOpen, setFuelOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(true);
 
   useEffect(() => {
@@ -115,12 +139,6 @@ function ShopPageInner() {
         }
       })
       .catch(err => console.error('Failed to fetch config:', err));
-
-    cachedFetch<{ success: boolean; categories: { Kodi: string; Pershkrim: string }[] }>('/api/categories')
-      .then(data => {
-        if (data.success) setCategories(data.categories);
-      })
-      .catch(err => console.error('Failed to fetch categories:', err));
 
     setFavoriteIds(new Set<number>(getFavorites()));
     const unsubscribe = onFavoritesChanged(() => {
@@ -164,11 +182,9 @@ function ShopPageInner() {
     async function fetchProducts() {
       setLoading(true);
       try {
-        const isAll = !category || category === 'All';
         const params = new URLSearchParams({
           page: pagination.page.toString(),
           limit: pagination.limit.toString(),
-          ...(isAll ? {} : { categoryName: category }),
           search: '',
           sortBy,
         });
@@ -188,7 +204,7 @@ function ShopPageInner() {
     }
 
     fetchProducts();
-  }, [pagination.page, pagination.limit, category, search, sortBy]);
+  }, [pagination.page, pagination.limit, search, sortBy]);
 
   function changePage(newPage: number) {
     setPagination(prev => ({ ...prev, page: newPage }));
@@ -205,7 +221,7 @@ function ShopPageInner() {
     // "Lejo porosi kur nuk ka gjendje" toggle is on, zero-stock items add
     // silently — backend still validates at checkout.
     if (product.stock <= 0 && (config as any)?.allow_out_of_stock_orders === false) {
-      const msg = (config as any)?.out_of_stock_message || 'Ky produkt nuk ka gjendje per momentin';
+      const msg = (config as any)?.out_of_stock_message || 'Kjo makine nuk eshte e disponueshme per momentin';
       showToast(msg);
       return;
     }
@@ -214,7 +230,7 @@ function ShopPageInner() {
       if (existing) return prev.map((i) => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
       return [...prev, { ...product, qty: 1 }];
     });
-    showToast(`${product.name} u shtua ne shporte`);
+    showToast(`${product.name} u shtua ne rezervim`);
   }
 
   function removeFromCart(id: number) {
@@ -249,9 +265,44 @@ function ShopPageInner() {
   }
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
-  const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const currencySymbol = config?.currency_symbol || 'L';
-  const primaryColor = '#1F3E76';
+
+  function toggleSet<T>(setter: React.Dispatch<React.SetStateAction<Set<T>>>, value: T) {
+    setter(prev => {
+      const next = new Set(prev);
+      if (next.has(value)) next.delete(value); else next.add(value);
+      return next;
+    });
+  }
+
+  function clearAllFilters() {
+    setSelectedPriceBuckets(new Set());
+    setSelectedCategories(new Set());
+    setSelectedTransmissions(new Set());
+    setSelectedFuels(new Set());
+  }
+
+  const activeFilterCount =
+    selectedPriceBuckets.size +
+    selectedCategories.size +
+    selectedTransmissions.size +
+    selectedFuels.size;
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => {
+      if (selectedPriceBuckets.size > 0) {
+        const matchesBucket = PRICE_BUCKETS.some(b =>
+          selectedPriceBuckets.has(b.label) && p.price >= b.min && p.price < b.max
+        );
+        if (!matchesBucket) return false;
+      }
+      const specs = getCarSpecs(p.id);
+      if (selectedCategories.size > 0 && !selectedCategories.has(specs.vehicleCategory)) return false;
+      if (selectedTransmissions.size > 0 && !selectedTransmissions.has(specs.transmission)) return false;
+      if (selectedFuels.size > 0 && !selectedFuels.has(specs.fuel)) return false;
+      return true;
+    });
+  }, [products, selectedPriceBuckets, selectedCategories, selectedTransmissions, selectedFuels]);
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
@@ -260,19 +311,31 @@ function ShopPageInner() {
       {/* Main layout: sidebar + content */}
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
         {/* Sticky left sidebar filters */}
-        <aside className="hidden md:block w-64 shrink-0">
-          <div className="sticky top-24 space-y-4 bg-white rounded-2xl shadow-sm p-4">
+        <aside className="hidden md:block w-72 shrink-0">
+          <div className="sticky top-24 bg-white rounded-2xl shadow-sm overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+              <h2 className="text-base font-bold text-gray-900">Filtro</h2>
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={clearAllFilters}
+                  className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 hover:text-[#1F3E76] transition"
+                >
+                  Pastro filtrat
+                </button>
+              )}
+            </div>
+
             {/* Search */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wider">Kerko</h3>
+            <div className="px-4 py-3 border-b border-gray-100">
               <div className="relative">
                 <Search size={16} strokeWidth={2.5} color="#9ca3af" className="absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Kerko produkte..."
+                  placeholder="Kerko model, marke..."
                   value={search}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg pl-9 pr-8 py-2 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1F3E76]"
+                  className="w-full border border-gray-200 rounded-lg pl-9 pr-8 py-2 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1F3E76]"
                 />
                 {search && (
                   <button onClick={() => handleSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">✕</button>
@@ -280,32 +343,135 @@ function ShopPageInner() {
               </div>
             </div>
 
-            {/* Categories */}
-            <div>
+            {/* Price Range */}
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => setPriceOpen(v => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-gray-900 uppercase tracking-wider hover:bg-gray-50 transition"
+              >
+                Cmimi /dite
+                <ChevronDown size={14} className={`transition-transform duration-200 ${priceOpen ? '' : '-rotate-90'}`} />
+              </button>
+              {priceOpen && (
+                <div className="px-4 pb-3 space-y-1.5">
+                  {PRICE_BUCKETS.map(b => {
+                    const checked = selectedPriceBuckets.has(b.label);
+                    return (
+                      <label
+                        key={b.label}
+                        className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-gray-50 cursor-pointer text-sm text-gray-700"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleSet(setSelectedPriceBuckets, b.label)}
+                          className="w-4 h-4 rounded border-gray-300"
+                          style={{ accentColor: '#1F3E76' }}
+                        />
+                        <span>{b.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Vehicle Category */}
+            <div className="border-b border-gray-100">
               <button
                 onClick={() => setCatOpen(v => !v)}
-                className="w-full flex items-center justify-between text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wider hover:text-[#1F3E76] transition"
+                className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-gray-900 uppercase tracking-wider hover:bg-gray-50 transition"
               >
-                Kategorite
-                <ChevronDown size={16} className={`transition-transform duration-200 ${catOpen ? '' : '-rotate-90'}`} />
+                Klasa e makines
+                <ChevronDown size={14} className={`transition-transform duration-200 ${catOpen ? '' : '-rotate-90'}`} />
               </button>
               {catOpen && (
-                <div className="space-y-1 max-h-[50vh] overflow-y-auto overscroll-contain pr-1 scrollbar-thin">
-                  <button
-                    onClick={() => { setCategory('All'); setPagination(prev => ({ ...prev, page: 1 })); }}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition ${category === 'All' ? 'bg-[#1F3E76] text-white font-medium' : 'text-gray-700 bg-blue-50 hover:bg-blue-100'}`}
-                  >
-                    Te gjitha
-                  </button>
-                  {categories.map(c => (
-                    <button
-                      key={c.Kodi}
-                      onClick={() => { setCategory(c.Pershkrim); setPagination(prev => ({ ...prev, page: 1 })); }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition ${category === c.Pershkrim ? 'bg-[#1F3E76] text-white font-medium' : 'text-gray-700 bg-blue-50 hover:bg-blue-100'}`}
-                    >
-                      {c.Pershkrim}
-                    </button>
-                  ))}
+                <div className="px-2 pb-3 space-y-0.5">
+                  {VEHICLE_CATEGORIES.map(cat => {
+                    const Icon = CATEGORY_ICONS[cat];
+                    const checked = selectedCategories.has(cat);
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => toggleSet(setSelectedCategories, cat)}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${
+                          checked
+                            ? 'bg-[#1F3E76] text-white font-semibold'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        <Icon size={18} strokeWidth={2} className={checked ? 'text-white' : 'text-gray-500'} />
+                        <span className="flex-1 text-left">{cat}</span>
+                        {checked && <span className="text-xs">✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Gear Shift */}
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => setGearOpen(v => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-gray-900 uppercase tracking-wider hover:bg-gray-50 transition"
+              >
+                Transmisioni
+                <ChevronDown size={14} className={`transition-transform duration-200 ${gearOpen ? '' : '-rotate-90'}`} />
+              </button>
+              {gearOpen && (
+                <div className="px-4 pb-3 space-y-1.5">
+                  {TRANSMISSIONS.map(t => {
+                    const checked = selectedTransmissions.has(t);
+                    return (
+                      <label
+                        key={t}
+                        className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-gray-50 cursor-pointer text-sm text-gray-700"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleSet(setSelectedTransmissions, t)}
+                          className="w-4 h-4 rounded border-gray-300"
+                          style={{ accentColor: '#1F3E76' }}
+                        />
+                        <span>{t}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Fuel Type */}
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => setFuelOpen(v => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-gray-900 uppercase tracking-wider hover:bg-gray-50 transition"
+              >
+                Karburanti
+                <ChevronDown size={14} className={`transition-transform duration-200 ${fuelOpen ? '' : '-rotate-90'}`} />
+              </button>
+              {fuelOpen && (
+                <div className="px-4 pb-3 space-y-1.5">
+                  {FUEL_TYPES.map(f => {
+                    const checked = selectedFuels.has(f);
+                    return (
+                      <label
+                        key={f}
+                        className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-gray-50 cursor-pointer text-sm text-gray-700"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleSet(setSelectedFuels, f)}
+                          className="w-4 h-4 rounded border-gray-300"
+                          style={{ accentColor: '#1F3E76' }}
+                        />
+                        <span>{f}</span>
+                      </label>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -314,15 +480,15 @@ function ShopPageInner() {
             <div>
               <button
                 onClick={() => setSortOpen(v => !v)}
-                className="w-full flex items-center justify-between text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wider hover:text-[#1F3E76] transition"
+                className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-gray-900 uppercase tracking-wider hover:bg-gray-50 transition"
               >
                 Rendit sipas
-                <ChevronDown size={16} className={`transition-transform duration-200 ${sortOpen ? '' : '-rotate-90'}`} />
+                <ChevronDown size={14} className={`transition-transform duration-200 ${sortOpen ? '' : '-rotate-90'}`} />
               </button>
               {sortOpen && (
-                <div className="space-y-1">
+                <div className="px-4 pb-3 space-y-1">
                   {[
-                    { value: 'default', label: 'Normal' },
+                    { value: 'default', label: 'Me te kerkuarat' },
                     { value: 'price-asc', label: 'Cmimi: Ulet ne te Larte' },
                     { value: 'price-desc', label: 'Cmimi: Larte ne te Ulet' },
                     { value: 'name', label: 'Emri: A-Z' },
@@ -330,7 +496,7 @@ function ShopPageInner() {
                     <button
                       key={opt.value}
                       onClick={() => { setSortBy(opt.value); setPagination(prev => ({ ...prev, page: 1 })); }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition ${sortBy === opt.value ? 'bg-[#1F3E76] text-white font-medium' : 'text-gray-700 bg-blue-50 hover:bg-blue-100'}`}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition ${sortBy === opt.value ? 'bg-[#1F3E76] text-white font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
                     >
                       {opt.label}
                     </button>
@@ -345,38 +511,26 @@ function ShopPageInner() {
         <div className="flex-1 min-w-0">
           {/* Results info */}
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">
-              {category === 'All' ? 'Te gjitha produktet' : category}
-            </h1>
-            {!loading && pagination.total > 0 && (
+            <h1 className="text-2xl font-bold text-gray-900">Zgjidh makinen tende</h1>
+            {!loading && (
               <span className="text-sm text-gray-500">
-                {pagination.total} produkte
+                {filteredProducts.length} te disponueshme
               </span>
             )}
           </div>
 
-          {/* Mobile filters (visible on small screens) */}
+          {/* Mobile search + sort (visible on small screens; full filter sidebar is hidden) */}
           <div className="flex flex-col sm:flex-row md:hidden gap-2 mb-4">
             <div className="relative flex-1">
               <Search size={16} strokeWidth={2.5} color="#9ca3af" className="absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Kerko..."
+                placeholder="Kerko makina..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1F3E76]"
               />
             </div>
-            <select
-              value={category}
-              onChange={(e) => { setCategory(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
-              className="border border-gray-300 rounded-lg px-2 py-2 text-sm text-gray-700 focus:outline-none"
-            >
-              <option value="All">Te gjitha</option>
-              {categories.map(c => (
-                <option key={c.Kodi} value={c.Pershkrim}>{c.Pershkrim}</option>
-              ))}
-            </select>
             <select
               value={sortBy}
               onChange={(e) => { setSortBy(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
@@ -406,11 +560,13 @@ function ShopPageInner() {
               </div>
             ))}
           </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-20 text-gray-400 text-lg">Nuk u gjeten produkte.</div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-20 text-gray-400 text-lg">
+            {activeFilterCount > 0 ? 'Asnje makine nuk perputhet me filtrat. Provoni te pastroni disa.' : 'Nuk u gjeten makina.'}
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product as any}
@@ -431,7 +587,7 @@ function ShopPageInner() {
             <div className="pb-8 mt-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Artikuj per faqe:</span>
+                  <span className="text-sm text-gray-600">Makina per faqe:</span>
                   <select
                     value={pagination.limit}
                     onChange={(e) => setPagination(prev => ({ ...prev, limit: parseInt(e.target.value), page: 1 }))}
@@ -487,20 +643,6 @@ function ShopPageInner() {
         </div>
       </div>
 
-      {/* Cart Drawer */}
-      {cartOpen && (
-        <CartDrawer
-          cart={cart}
-          cartCount={cartCount}
-          cartTotal={cartTotal}
-          currencySymbol={currencySymbol}
-          onClose={() => setCartOpen(false)}
-          onUpdateQty={updateQty}
-          onRemove={removeFromCart}
-          onCheckoutDone={(msg) => showToast(msg)}
-          onClearCart={() => setCart([])}
-        />
-      )}
 
       {/* Toast */}
       {toast && (

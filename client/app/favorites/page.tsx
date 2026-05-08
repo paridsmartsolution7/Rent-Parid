@@ -7,7 +7,6 @@ import { ShoppingBag } from "lucide-react";
 import { fetchFavoritesFromDB, removeFavorite as removeFavoriteStorage, onFavoritesChanged } from "../lib/favorites";
 import { cachedFetch } from "../lib/clientCache";
 import Navbar from "../components/Navbar";
-import CartDrawer from "../components/CartDrawer";
 import ProductCard from "../components/ProductCardFixed";
 
 type Product = {
@@ -151,7 +150,7 @@ export default function FavoritesPage() {
         }}
       >
         <h1 className="text-4xl font-bold mb-3">Te preferuarat e mia</h1>
-        <p className="text-blue-100 text-lg">Produktet e ruajtura</p>
+        <p className="text-blue-100 text-lg">Makinat e ruajtura</p>
       </div>
 
       {/* Products Grid */}
@@ -168,7 +167,7 @@ export default function FavoritesPage() {
                 background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`
               }}
             >
-              <span>Fillo Blerjet</span>
+              <span>Shfleto makinat</span>
               <ShoppingBag size={18} strokeWidth={2.5} />
             </button>
           </div>
@@ -184,11 +183,11 @@ export default function FavoritesPage() {
                     if (existing) return prev.map((i) => i.id === p.id ? { ...i, qty: i.qty + 1 } : i);
                     return [...prev, { id: p.id, name: p.name, price: p.price, image: p.image, imageCount: p.imageCount, qty: 1 }];
                   });
-                  showToast(`${product.name} u shtua ne shporte`);
+                  showToast(`${product.name} u shtua ne rezervim`);
                 }}
                 onRemoveFromCart={(id) => {
                   removeFromCartFn(id);
-                  showToast('U hoq nga shporta');
+                  showToast('U hoq nga rezervimi');
                 }}
                 config={config as any}
                 isFavorite={true}
@@ -201,20 +200,6 @@ export default function FavoritesPage() {
         )}
       </div>
 
-      {/* Cart Drawer */}
-      {cartOpen && (
-        <CartDrawer
-          cart={cart}
-          cartCount={cartCount}
-          cartTotal={cartTotal}
-          currencySymbol={currencySymbol}
-          onClose={() => setCartOpen(false)}
-          onUpdateQty={updateQty}
-          onRemove={removeFromCartFn}
-          onCheckoutDone={(msg) => showToast(msg)}
-          onClearCart={() => setCart([])}
-        />
-      )}
 
       {/* Toast */}
       {toast && (

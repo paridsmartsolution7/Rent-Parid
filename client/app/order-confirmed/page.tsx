@@ -26,8 +26,8 @@ function OrderConfirmedContent() {
     "expired-or-invalid": "Kjo lidhje konfirmimi ka skaduar ose eshte e pavlefshme.",
     "bad-token": "Lidhja e konfirmimit eshte e gabuar.",
     "user-not-found": "Llogaria juaj nuk u gjet.",
-    "product-unavailable": "Nje nga produktet nuk eshte me i disponueshem.",
-    "db": "Ndodhi nje gabim gjate ruajtjes se porosise.",
+    "product-unavailable": "Nje nga makinat nuk eshte me e disponueshme.",
+    "db": "Ndodhi nje gabim gjate ruajtjes se rezervimit.",
     "server": "Ndodhi nje gabim ne server. Provoni perseri.",
   };
 
@@ -37,9 +37,9 @@ function OrderConfirmedContent() {
         {isOk ? (
           <>
             <div className="text-6xl mb-4">🎉</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Porosia u Konfirmua</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Rezervimi u Konfirmua</h1>
             <p className="text-gray-600 mb-4">
-              Porosia juaj <b>#{kodi}</b> u vendos me sukses.
+              Rezervimi juaj <b>#{kodi}</b> u vendos me sukses.
             </p>
             {total && (
               <p className="text-gray-900 font-semibold mb-6">Totali: ${total}</p>
@@ -49,7 +49,7 @@ function OrderConfirmedContent() {
           <>
             <div className="text-6xl mb-4">⚠️</div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Porosia nuk mund te konfirmohet
+              Rezervimi nuk mund te konfirmohet
             </h1>
             <p className="text-gray-600 mb-6">
               {reasonMessages[reason || ""] || "Something went wrong."}
@@ -61,7 +61,7 @@ function OrderConfirmedContent() {
           className="text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition"
           style={{ background: "linear-gradient(135deg, #1F3E76, #1F3E76)" }}
         >
-          Kthehu ne Dyqan
+          Kthehu ne Faqe
         </button>
       </div>
     </div>

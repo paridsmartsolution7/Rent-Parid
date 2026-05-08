@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PSS Shop — Dyqani Online",
-  description: "Dyqani juaj online i besuar — produkte cilesore, dergesa te shpejta dhe sherbim i shkellqyer.",
+  title: "Rent Parid — Qira Makinash",
+  description: "Qira makinash ne te gjithe Shqiperine — flota moderne, cmime te qarta dhe rezervim i shpejte online.",
   // Browser-tab favicon: trimmed + re-rendered at 256x256 so the logo fills
   // the favicon canvas (was looking small because the source PNG had
   // transparent padding around the mark).

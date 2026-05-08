@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
 import HeartButton from "../components/HeartButton";
 import ProductCardFixed from "../components/ProductCardFixed";
 import UserMenu from "../components/UserMenu";
@@ -137,15 +136,15 @@ export default function CategoryPage() {
           setProfileGap({ missing: data.missing, currentUser: data.currentUser });
           return;
         }
-        showToast(data.message || 'Pagesa deshtoi');
+        showToast(data.message || 'Rezervimi deshtoi');
         return;
       }
-      showToast(`Konfirmoni porosine ne gmail`);
+      showToast(`Konfirmoni rezervimin ne gmail`);
       setCart([]);
       setCartOpen(false);
     } catch (err) {
       console.error('Checkout error:', err);
-      showToast('Pagesa deshtoi');
+      showToast('Rezervimi deshtoi');
     }
   }
 
@@ -252,7 +251,7 @@ export default function CategoryPage() {
   function addToCart(product: Product) {
     // OOS toast only when admin has disabled OOS orders.
     if (product.stock <= 0 && (config as any)?.allow_out_of_stock_orders === false) {
-      const msg = (config as any)?.out_of_stock_message || 'Ky produkt nuk ka gjendje per momentin';
+      const msg = (config as any)?.out_of_stock_message || 'Kjo makine nuk eshte e disponueshme per momentin';
       showToast(msg);
       return;
     }
@@ -261,7 +260,7 @@ export default function CategoryPage() {
       if (existing) return prev.map((i) => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
       return [...prev, { ...product, qty: 1 }];
     });
-    showToast(`${product.name} u shtua ne shporte`);
+    showToast(`${product.name} u shtua ne rezervim`);
   }
 
   function removeFromCart(id: number) {
@@ -290,7 +289,7 @@ export default function CategoryPage() {
         }}
       >
         <h1 className="text-4xl font-bold mb-3">{categoryName || categorySlug}</h1>
-        <p className="text-blue-100 text-lg mb-6">Shfletoni koleksionin tone</p>
+        <p className="text-blue-100 text-lg mb-6">Shfletoni floten tone te makinave</p>
         <button
           onClick={() => router.push('/')}
           className="bg-white font-semibold px-6 py-3 rounded-full hover:opacity-90 transition"
@@ -305,7 +304,7 @@ export default function CategoryPage() {
         <div className="max-w-7xl mx-auto px-4 py-3">
           <input
             type="text"
-            placeholder="Kerko produkte..."
+            placeholder="Kerko makina..."
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             className="w-full border border-gray-300 rounded-full px-4 py-2 text-sm text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-[#1F3E76]"
@@ -323,8 +322,8 @@ export default function CategoryPage() {
             className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1F3E76]"
           >
             <option value="default">Rendit: Normal</option>
-            <option value="price-asc">Cmimi: Ulet ne te Larte</option>
-            <option value="price-desc">Cmimi: Larte ne te Ulet</option>
+            <option value="price-asc">Cmimi/dite: Ulet ne te Larte</option>
+            <option value="price-desc">Cmimi/dite: Larte ne te Ulet</option>
             <option value="name">Emri: A-Z</option>
           </select>
         </div>
@@ -349,7 +348,7 @@ export default function CategoryPage() {
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center py-20 text-gray-400 text-lg">Nuk u gjeten produkte ne kete kategori.</div>
+          <div className="text-center py-20 text-gray-400 text-lg">Nuk u gjeten makina ne kete klase.</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (
@@ -374,7 +373,7 @@ export default function CategoryPage() {
         <div className="max-w-7xl mx-auto px-4 pb-16">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Artikuj per faqe:</span>
+              <span className="text-sm text-gray-600">Makina per faqe:</span>
               <select
                 value={pagination.limit}
                 onChange={(e) => changeLimit(parseInt(e.target.value))}
@@ -388,7 +387,7 @@ export default function CategoryPage() {
             </div>
             
             <span className="text-sm text-gray-500">
-              Duke shfaqur {((pagination.page - 1) * pagination.limit) + 1}-{Math.min(pagination.page * pagination.limit, pagination.total)} nga {pagination.total} produkte
+              Duke shfaqur {((pagination.page - 1) * pagination.limit) + 1}-{Math.min(pagination.page * pagination.limit, pagination.total)} nga {pagination.total} makina
             </span>
           </div>
           
@@ -430,65 +429,6 @@ export default function CategoryPage() {
             >
               Para
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Cart Drawer */}
-      {cartOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          <div className="flex-1 bg-black/40" onClick={() => setCartOpen(false)} />
-          <div className="w-full sm:max-w-sm bg-white text-gray-900 h-full flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b">
-              <h2 className="text-lg font-bold">Shporta juaj ({cartCount})</h2>
-              <button onClick={() => setCartOpen(false)} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-              {cart.length === 0 ? (
-                <p className="text-gray-600 text-center mt-10">Shporta juaj eshte bosh.</p>
-              ) : (
-                cart.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3">
-                    {((item as any).imageCount ?? 0) > 0 ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={`/api/products/${item.id}/image`}
-                        alt={item.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-12 h-12 object-contain rounded"
-                      />
-                    ) : (
-                      <span className="text-3xl">{item.image}</span>
-                    )}
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{item.name}</p>
-                      <p className="text-xs text-gray-500">{config?.currency_symbol || 'L'}{item.price.toFixed(2)}</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-6 h-6 rounded border border-gray-400 bg-white text-sm text-gray-900 hover:bg-gray-100 font-semibold">−</button>
-                      <span className="w-6 text-center text-sm font-medium">{item.qty}</span>
-                      <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-6 h-6 rounded border border-gray-400 bg-white text-sm text-gray-900 hover:bg-gray-100 font-semibold">+</button>
-                    </div>
-                    <button onClick={() => removeFromCart(item.id)} className="text-red-600 hover:text-red-700 text-lg">🗑</button>
-                  </div>
-                ))
-              )}
-            </div>
-            {cart.length > 0 && (
-              <div className="px-5 py-4 border-t space-y-3">
-                <div className="flex justify-between font-semibold text-lg">
-                  <span>Totali</span>
-                  <span>{config?.currency_symbol || 'L'}{cartTotal.toFixed(2)}</span>
-                </div>
-                <button
-                  onClick={runCheckout}
-                  className="w-full bg-[#1F3E76] text-white py-3 rounded-full font-semibold hover:bg-[#1F3E76] transition"
-                >
-                  Perfundo porosine
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -551,7 +491,7 @@ function ProductCard({
         )}
         {Number(product.isBestseller) === 1 && (
           <span className="bg-purple-100 text-purple-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
-            Bestseller
+            Me e kerkuar
           </span>
         )}
       </div>
@@ -591,17 +531,17 @@ function ProductCard({
             )}
           </div>
           <div className="flex items-center justify-end gap-2">
-            <button
-              onClick={() => {
-                if (isInCart && onCartOpen) { onCartOpen(); return; }
-                onAdd(product);
-              }}
-              aria-disabled={product.stock <= 0}
-              className={`w-9 h-9 flex items-center justify-center rounded-full shadow-md hover:shadow-lg transition shrink-0 ${product.stock <= 0 && !isInCart ? 'opacity-40' : ''} ${isInCart ? 'bg-[#1F3E76] text-white' : 'bg-white text-gray-700 hover:text-[#1F3E76]'}`}
-              aria-label={isInCart ? 'Shiko shporten' : 'Shto ne shporte'}
-            >
-              <ShoppingBag size={16} fill={isInCart ? 'currentColor' : 'none'} />
-            </button>
+            {product.stock <= 0 ? (
+              <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">E zene</span>
+            ) : (
+              <Link
+                href={`/product/${product.id}`}
+                className="px-4 py-2 rounded-full text-xs font-semibold bg-gray-900 text-white hover:bg-[#1F3E76] transition shrink-0"
+                aria-label="Rezervo tani"
+              >
+                Rezervo tani
+              </Link>
+            )}
             <HeartButton
               active={isFavorite}
               onClick={() => onToggleFavorite(product.id)}
@@ -609,7 +549,7 @@ function ProductCard({
           </div>
         </div>
         {showStockWarning && product.stock <= 5 && product.stock > 0 && (
-          <p className="text-xs text-orange-500 mt-1">Vetem {product.stock} te mbetura!</p>
+          <p className="text-xs text-orange-500 mt-1">Vetem {product.stock} te disponueshme!</p>
         )}
       </div>
     </div>

@@ -364,10 +364,10 @@ export default function AuthPage() {
           />
           <div className="min-w-0">
             <h1 className="text-2xl sm:text-3xl font-bold leading-tight truncate">
-              {config?.company_name || 'PSS Shop'}
+              {config?.company_name || 'Rent Parid'}
             </h1>
             <p className="text-blue-100 text-sm sm:text-base">
-              Miresevini! Hyni ose krijoni nje llogari.
+              Miresevini! Hyni ose krijoni nje llogari per te rezervuar makinat me te shpejte.
             </p>
           </div>
         </div>

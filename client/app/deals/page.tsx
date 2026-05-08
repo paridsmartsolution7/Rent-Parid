@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Tag } from "lucide-react";
 import Navbar from "../components/Navbar";
-import CartDrawer from "../components/CartDrawer";
 import ProductCard from "../components/ProductCardFixed";
 import { cachedFetch } from "../lib/clientCache";
 import {
@@ -76,7 +75,7 @@ export default function DealsPage() {
   function addToCart(p: Product) {
     // OOS toast only when admin has disabled OOS orders.
     if (p.stock <= 0 && (config as any)?.allow_out_of_stock_orders === false) {
-      const msg = (config as any)?.out_of_stock_message || 'Ky produkt nuk ka gjendje per momentin';
+      const msg = (config as any)?.out_of_stock_message || 'Kjo makine nuk eshte e disponueshme per momentin';
       showToast(msg);
       return;
     }
@@ -85,7 +84,7 @@ export default function DealsPage() {
       if (existing) return prev.map((i) => i.id === p.id ? { ...i, qty: i.qty + 1 } : i);
       return [...prev, { id: p.id, name: p.name, price: p.price, image: p.image, imageCount: p.imageCount, qty: 1 }];
     });
-    showToast(`${p.name} u shtua ne shporte`);
+    showToast(`${p.name} u shtua ne rezervim`);
   }
   function removeFromCart(id: number) {
     setCart((prev) => prev.filter((i) => i.id !== id));
@@ -139,7 +138,7 @@ export default function DealsPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">Oferta</h1>
         </div>
         <p className="text-gray-600 mb-8">
-          Te gjitha produktet me oferte aktive — kursime te garantuara per ju.
+          Te gjitha makinat me cmim te zbritur — kursime te garantuara per udhetimin tuaj.
         </p>
 
         {loading ? (
@@ -167,19 +166,6 @@ export default function DealsPage() {
         )}
       </div>
 
-      {cartOpen && (
-        <CartDrawer
-          cart={cart}
-          cartCount={cartCount}
-          cartTotal={cartTotal}
-          currencySymbol={currencySymbol}
-          onClose={() => setCartOpen(false)}
-          onUpdateQty={updateQty}
-          onRemove={removeFromCart}
-          onCheckoutDone={(msg) => showToast(msg)}
-          onClearCart={() => setCart([])}
-        />
-      )}
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-full text-sm shadow-lg z-50 animate-fade-in">

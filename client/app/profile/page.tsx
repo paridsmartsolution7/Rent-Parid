@@ -143,7 +143,7 @@ export default function ProfilePage() {
           );
           if (newlyConfirmed.length > 0 && !silent) {
             const kodi = newlyConfirmed[0].kodi;
-            showSuccess(`Porosia #${kodi} u konfirmua me sukses! 🎉`);
+            showSuccess(`Rezervimi #${kodi} u konfirmua me sukses! 🎉`);
           }
         }
 
@@ -247,7 +247,7 @@ export default function ProfilePage() {
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
-            Porosite e mia
+            Rezervimet e mia
           </button>
           <button
             onClick={() => setActiveTab('info')}
@@ -270,13 +270,13 @@ export default function ProfilePage() {
               <div className="mb-4 flex justify-center">
                 <ShoppingCart size={56} strokeWidth={1.5} className="text-gray-400" />
               </div>
-              <p className="text-gray-500 text-lg mb-4">Nuk keni bere asnje porosi ende</p>
+              <p className="text-gray-500 text-lg mb-4">Nuk keni bere asnje rezervim ende</p>
               <Link
                 href="/shop"
                 className="inline-flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-full transition hover:opacity-90"
                 style={{ backgroundColor: primaryColor }}
               >
-                <span>Fillo Blerjet</span>
+                <span>Shfleto makinat</span>
                 <ShoppingBag size={18} strokeWidth={2.5} />
               </Link>
             </div>
@@ -291,7 +291,7 @@ export default function ProfilePage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="text-left">
-                        <div className="font-semibold text-gray-900">Porosia #{order.kodi}</div>
+                        <div className="font-semibold text-gray-900">Rezervimi #{order.kodi}</div>
                         <div className="text-xs text-gray-500">
                           {formatDate(order.data, {
                             year: 'numeric',

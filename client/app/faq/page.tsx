@@ -12,32 +12,36 @@ const faqs = [
     answer: "Klikoni mbi ikonen e perdoruesit ne kendin e siperm djathtas dhe zgjidhni 'Regjistrohu'. Plotesoni te dhenat tuaja dhe verifikoni email-in me kodin 4-shifror. Mund te regjistroheni menjehere edhe me llogarinë tuaj Google.",
   },
   {
-    question: "Si te bej nje porosi?",
-    answer: "Shfletoni produktet tona, shtoni artikuj ne shporte dhe klikoni 'Perfundo porosine'. Do te merrni nje email konfirmimi pasi porosia te vendoset.",
+    question: "Si te rezervoj nje makine?",
+    answer: "Shfletoni floten tone, zgjidhni makinen qe ju pelqen, shtojeni ne rezervim dhe klikoni 'Konfirmo rezervimin'. Do te merrni nje email me detajet e qirase pasi rezervimi te vendoset.",
+  },
+  {
+    question: "Cfare dokumentash me duhen per te marre nje makine me qira?",
+    answer: "Ju duhet nje patente shoferi e vlefshme (te pakten 1 vit), nje dokument identifikimi (karte ID ose pasaporte) dhe nje karte krediti ose debiti per garancine. Mosha minimale eshte 21 vjec.",
   },
   {
     question: "Cilat metoda pagese pranoni?",
-    answer: "Pranojme metoda te ndryshme pagese duke perfshire transferta bankare dhe pagese ne dorezim. Opsionet e pageses mund te ndryshojne sipas vendndodhjes suaj.",
+    answer: "Pranojme pagese me karte (Visa, Mastercard), transferte bankare dhe kesh ne marrjen e makines. Garancia ngrihet zakonisht me karte krediti dhe lirohet pasi te ktheni makinen pa demtime.",
   },
   {
-    question: "Si mund ta ndjek porosine time?",
-    answer: "Pasi porosia juaj te konfirmohet, do te merrni nje email me detajet e porosise. Mund te kontrolloni gjithashtu statusin duke kontaktuar ekipin tone te mbeshtjetjes.",
+    question: "A perfshihet sigurimi ne cmim?",
+    answer: "Cdo cmim ditor perfshin sigurimin baze (TPL + CDW). Mund te shtoni edhe sigurim te plote pa franshize si opsion shtese ne momentin e rezervimit.",
   },
   {
-    question: "A mund ta anuloj ose ndryshoj porosine?",
-    answer: "Mund te kerkoni anulim ose ndryshim duke kontaktuar ekipin tone sa me shpejt. Pasi porosia te procesohej per dergese, ndryshimet mund te mos jene te mundshme.",
+    question: "A mund ta anuloj ose ndryshoj rezervimin?",
+    answer: "Anulimi eshte falas deri 24 ore para fillimit te qirase. Per ndryshime ne data ose model na kontaktoni sa me shpejt — mundesia varet nga disponueshmeria e flotes.",
   },
   {
-    question: "Si t'i shtoj produktet ne te preferuarat?",
-    answer: "Klikoni ikonen e zemres ne cdo karte produkti per ta shtuar ne te preferuarat. Shikoni te gjitha produktet e preferuara duke klikuar 'Te preferuarat' ne shiritin e navigimit.",
+    question: "A mund te marr makinen ne aeroport?",
+    answer: "Po. Ofrojme dorezim dhe terheqje pa pagese ne Aeroportin Nene Tereza (Tirane Rinas) si dhe ne hotelet e qytetit. Vetem na njoftoni numrin e fluturimit dhe oren e mberritjes.",
   },
   {
-    question: "A eshte i sigurt informacioni im personal?",
-    answer: "Po, ne e marrim seriozisht privatesine tuaj. Fjalekalimi juaj eshte i enkriptuar dhe te dhenat personale ruhen ne menyre te sigurt. Nuk i ndajme kurre informacionet tuaja me pale te treta.",
+    question: "A ka kufizim per kilometrat?",
+    answer: "Pjesa me e madhe e tarifave perfshijne kilometra te pakufizuara brenda Shqiperise. Per udhetime jashte vendit duhet nje miratim paraprak dhe mund te aplikohet nje tarife shtese.",
   },
   {
     question: "Si te kontaktoj mbeshtjetjen e klientit?",
-    answer: "Na kontaktoni me email ne paridsmartsolution7@gmail.com ose na telefononi ne +355 69 202 0818. Ekipi yne eshte i disponueshem gjate orarit te punes.",
+    answer: "Na kontaktoni me email ne info@rentparid.al ose na telefononi ne +355 68 600 5016. Sherbimi i ndihmes ne rruge eshte i disponueshem 24/7 per cdo klient aktiv.",
   },
 ];
 
@@ -74,7 +78,7 @@ export default function FAQPage() {
         style={{ background: `linear-gradient(to right, ${primaryColor}, ${primaryColor})` }}
       >
         <h1 className="text-4xl font-bold mb-3">Pyetje te Shpeshta</h1>
-        <p className="text-blue-100 text-lg">Gjeni pergjigje per pyetjet me te zakonshme rreth dyqanit tone</p>
+        <p className="text-blue-100 text-lg">Pergjigjet per pyetjet me te zakonshme rreth qirase se makinave</p>
       </div>
 
       {/* FAQ List */}

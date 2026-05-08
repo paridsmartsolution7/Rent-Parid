@@ -28,7 +28,7 @@ export default function ContactPage() {
         style={{ background: `linear-gradient(to right, ${primaryColor}, ${primaryColor})` }}
       >
         <h1 className="text-4xl font-bold mb-3">Na Kontaktoni</h1>
-        <p className="text-blue-100 text-lg">Jemi ketu per t&apos;ju ndihmuar</p>
+        <p className="text-blue-100 text-lg">Jemi ketu per cdo pyetje rreth qirase se makinave</p>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-12">

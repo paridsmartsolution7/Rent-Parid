@@ -62,15 +62,15 @@ export default function CartDrawer({ cart, cartCount, cartTotal, currencySymbol,
           setProfileGap({ missing: data.missing, currentUser: data.currentUser });
           return;
         }
-        onCheckoutDone(data.message || 'Pagesa deshtoi');
+        onCheckoutDone(data.message || 'Rezervimi deshtoi');
         return;
       }
       onClearCart();
       onClose();
-      onCheckoutDone('Konfirmoni porosine ne gmail');
+      onCheckoutDone('Konfirmoni rezervimin ne gmail');
     } catch (err) {
       console.error('Checkout error:', err);
-      onCheckoutDone('Pagesa deshtoi');
+      onCheckoutDone('Rezervimi deshtoi');
     }
   }
 
@@ -80,12 +80,12 @@ export default function CartDrawer({ cart, cartCount, cartTotal, currencySymbol,
         <div className="flex-1 bg-black/40" onClick={onClose} />
         <div className="w-full sm:max-w-sm bg-white text-gray-900 h-full flex flex-col shadow-2xl">
           <div className="flex items-center justify-between px-5 py-4 border-b">
-            <h2 className="text-lg font-bold">Shporta juaj ({cartCount})</h2>
+            <h2 className="text-lg font-bold">Rezervimi juaj ({cartCount})</h2>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
           </div>
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
             {cart.length === 0 ? (
-              <p className="text-gray-600 text-center mt-10">Shporta juaj eshte bosh.</p>
+              <p className="text-gray-600 text-center mt-10">Nuk keni asnje makine te rezervuar.</p>
             ) : (
               cart.map((item) => (
                 /* min-w-0 + truncate inside lets the row collapse cleanly when
@@ -157,7 +157,7 @@ export default function CartDrawer({ cart, cartCount, cartTotal, currencySymbol,
                 onClick={runCheckout}
                 className="w-full bg-[#1F3E76] text-white py-3 rounded-full font-semibold hover:bg-[#1F3E76] transition"
               >
-                Perfundo porosine
+                Konfirmo rezervimin
               </button>
             </div>
           )}

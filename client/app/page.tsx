@@ -297,17 +297,17 @@ export default function Home() {
           setProfileGap({ missing: data.missing, currentUser: data.currentUser });
           return 'profile';
         }
-        showToast(data.message || 'Pagesa deshtoi');
+        showToast(data.message || 'Rezervimi deshtoi');
         return 'error';
       }
-      showToast(data.message || `Konfirmoni porosine ne gmail`);
+      showToast(data.message || `Konfirmoni rezervimin ne gmail`);
       setCart([]);
       try { localStorage.removeItem('cart'); } catch {}
       setCartOpen(false);
       return 'ok';
     } catch (err) {
       console.error('Checkout error:', err);
-      showToast('Pagesa deshtoi');
+      showToast('Rezervimi deshtoi');
       return 'error';
     }
   }
@@ -321,7 +321,7 @@ export default function Home() {
       localStorage.removeItem('pendingCheckout');
       if (items.length > 0) {
         setCartOpen(true);
-        showToast('Shporta juaj eshte gati — klikoni Perfundo porosine per te vazhduar.');
+        showToast('Rezervimi juaj eshte gati — klikoni Konfirmo rezervimin per te vazhduar.');
       }
     } catch {
       localStorage.removeItem('pendingCheckout');
@@ -333,7 +333,7 @@ export default function Home() {
     // allow_out_of_stock_orders is on (default), zero-stock items add to the
     // cart silently — the backend will still validate at checkout.
     if (product.stock <= 0 && (config as any)?.allow_out_of_stock_orders === false) {
-      const msg = (config as any)?.out_of_stock_message || 'Ky produkt nuk ka gjendje per momentin';
+      const msg = (config as any)?.out_of_stock_message || 'Kjo makine nuk eshte e disponueshme per momentin';
       showToast(msg);
       return;
     }
@@ -342,7 +342,7 @@ export default function Home() {
       if (existing) return prev.map((i) => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
       return [...prev, { ...product, qty: 1 }];
     });
-    showToast(`${product.name} u shtua ne shporte`);
+    showToast(`${product.name} u shtua ne rezervim`);
   }
 
   function removeFromCart(id: number) {
@@ -375,7 +375,7 @@ export default function Home() {
       <div className="text-white text-xs sm:text-sm font-medium text-center py-2 px-4" style={{ backgroundColor: GREEN_DARK }}>
         <span className="inline-flex items-center gap-2">
           <Truck size={16} strokeWidth={2} />
-          {config?.top_banner_text || 'Bejme dergesa ne te gjithe Shqiperine'}
+          {config?.top_banner_text || 'Dorezim makine falas ne te gjithe Shqiperine'}
         </span>
       </div>
 
@@ -440,7 +440,7 @@ export default function Home() {
               style={{ color: GREEN_DARK }}
             >
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: GREEN }} />
-              Ofertat e fundit
+              Rezervim i shpejte online
             </span>
             {/* Hero title + subtitle: admin-controlled. Default is empty —
                 if neither /api/hero (DB2) nor /api/config (DB1) carries a
@@ -475,21 +475,21 @@ export default function Home() {
                 className="inline-flex items-center gap-2 text-white font-semibold px-7 py-3.5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                 style={{ backgroundColor: GREEN }}
               >
-                {config?.hero_button_text || 'Zbulo programe & pajisje'}
+                {config?.hero_button_text || 'Shiko flotat e makinave'}
                 <ArrowRight size={18} strokeWidth={2.5} />
               </button>
               <button
                 onClick={() => document.getElementById("featured")?.scrollIntoView({ behavior: "smooth" })}
                 className="inline-flex items-center gap-2 font-semibold px-6 py-3.5 rounded-full bg-white shadow-sm text-gray-800 hover:bg-gray-50 transition"
               >
-                Shfleto produktet
+                Rezervo nje makine
               </button>
             </div>
 
             {/* Trust row */}
             <div className="flex items-center gap-4 sm:gap-6 mt-8 justify-center md:justify-start text-xs sm:text-sm text-gray-600">
-              <span className="inline-flex items-center gap-1.5"><span style={{ color: GREEN }}>✓</span> Dergesa 48h</span>
-              <span className="inline-flex items-center gap-1.5"><span style={{ color: GREEN }}>✓</span> Software i ligjshem</span>
+              <span className="inline-flex items-center gap-1.5"><span style={{ color: GREEN }}>✓</span> Dorezim ne aeroport</span>
+              <span className="inline-flex items-center gap-1.5"><span style={{ color: GREEN }}>✓</span> Sigurim i plote i perfshire</span>
               <span className="inline-flex items-center gap-1.5"><span style={{ color: GREEN }}>✓</span> Mbeshtetje 24/7</span>
             </div>
           </div>
@@ -516,7 +516,7 @@ export default function Home() {
           <Search size={20} strokeWidth={2.5} color="#9ca3af" className="ml-5" />
           <input
             type="text"
-            placeholder="Kerko sipas emrit te produktit, markes, kategorise..."
+            placeholder="Kerko sipas modelit, markes, klases se makines..."
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             className="flex-1 px-4 py-3 sm:py-4 text-sm text-black placeholder-gray-500 bg-transparent focus:outline-none"
@@ -539,11 +539,11 @@ export default function Home() {
         <section className="max-w-7xl mx-auto px-4 pb-12">
           <div className="text-center mb-10 max-w-3xl mx-auto">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-3">
-              {config?.categories_section_title || 'Kategoritë e produkteve'}
+              {config?.categories_section_title || 'Klasat e makinave'}
             </h2>
             <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
               {config?.categories_section_subtitle ||
-                'Zgjidhje teknologjike te certifikuara per biznesin tuaj — nga POS dhe fiskalizimi, deri tek pajisjet profesionale.'}
+                'Nga makina ekonomike e qytetit deri tek SUV familjare e makinat luksoze — gjej automjetin e duhur per cdo udhetim.'}
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
@@ -595,10 +595,10 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 pb-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {([
-            { Icon: Truck, title: 'Dergesa e shpejte', sub: 'Brenda 48 oreve' },
-            { Icon: Package, title: 'Cilesi Profesionale', sub: 'Te certifikuara' },
-            { Icon: CreditCard, title: 'Pagese e sigurte', sub: 'Online ose ne dorezim' },
-            { Icon: Undo2, title: 'Kthim falas', sub: 'Brenda 14 ditesh' },
+            { Icon: Truck, title: 'Dorezim ne aeroport', sub: 'Tirane Rinas & me gjere' },
+            { Icon: Package, title: 'Flote e mirembajtur', sub: 'Makina te servisuara plotesisht' },
+            { Icon: CreditCard, title: 'Pagese e sigurte', sub: 'Online ose ne marrjen e makines' },
+            { Icon: Undo2, title: 'Anulim falas', sub: 'Deri 24 ore para fillimit' },
           ] as { Icon: LucideIcon; title: string; sub: string }[]).map((f, idx) => (
             <div key={idx} className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 flex items-center gap-3 hover:shadow-md transition">
               <div
@@ -621,9 +621,9 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
           <div>
             <span className="inline-block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: GREEN_DARK }}>
-              Me te shituarit
+              Me te kerkuarat
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Bestsellers</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Makinat me te kerkuara</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
@@ -663,7 +663,7 @@ export default function Home() {
             ))}
           </div>
         ) : featuredProducts.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">Nuk u gjeten produkte ne kete kategori.</div>
+          <div className="text-center py-12 text-gray-400">Nuk u gjeten makina ne kete klase.</div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {featuredProducts.map(p => (
@@ -726,7 +726,7 @@ export default function Home() {
                   ))}
                   <ShowAllCard
                     href={`/${encodeURIComponent(groupName)}`}
-                    label={`Te gjitha produktet ${groupName}`}
+                    label={`Te gjitha makinat ${groupName}`}
                   />
                 </div>
               </div>
@@ -740,7 +740,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 pb-16">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Artikuj per faqe:</span>
+              <span className="text-sm text-gray-600">Makina per faqe:</span>
               <select
                 value={pagination.limit}
                 onChange={(e) => changeLimit(parseInt(e.target.value))}
@@ -754,7 +754,7 @@ export default function Home() {
               </select>
             </div>
             <span className="text-sm text-gray-500">
-              Duke shfaqur {((pagination.page - 1) * pagination.limit) + 1}-{Math.min(pagination.page * pagination.limit, pagination.total)} nga {pagination.total} produkte
+              Duke shfaqur {((pagination.page - 1) * pagination.limit) + 1}-{Math.min(pagination.page * pagination.limit, pagination.total)} nga {pagination.total} makina
             </span>
           </div>
 
@@ -800,7 +800,7 @@ export default function Home() {
       {/* Services */}
       {services.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 pb-12">
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-6">Sherbimet tona</h2>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-6">Sherbime shtese</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {services.map(s => (
               <div key={s.id} className="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md transition">
@@ -821,11 +821,11 @@ export default function Home() {
                         if (existing) return prev.map(i => i.id === s.id && i.itemType === 'SH' ? { ...i, qty: i.qty + 1 } : i);
                         return [...prev, { id: s.id, name: s.name, price: s.price || 0, category: '', categoryName: '', image: '', description: '', rating: 0, stock: 999, unit: s.unit, qty: 1, itemType: 'SH' as const }];
                       });
-                      showToast(`${s.name} u shtua ne shporte`);
+                      showToast(`${s.name} u shtua ne rezervim`);
                     }}
                     className="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-md text-gray-700 hover:shadow-lg transition"
                     style={{ color: GREEN_DARK }}
-                    aria-label="Shto ne shporte"
+                    aria-label="Shto ne rezervim"
                   >
                     <ShoppingBag size={16} />
                   </button>
@@ -847,11 +847,11 @@ export default function Home() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/api/about/image"
-              alt={config?.company_name || 'PSS Shop'}
+              alt={config?.company_name || 'Rent Parid'}
               className="absolute inset-0 w-full h-full object-contain"
               onError={(e) => {
                 const img = e.currentTarget as HTMLImageElement;
-                const fallback = config?.about_image_url || 'https://picsum.photos/seed/pss-shop-about/900/700';
+                const fallback = config?.about_image_url || 'https://picsum.photos/seed/rent-parid-about/900/700';
                 if (img.src.endsWith('/api/about/image')) img.src = fallback;
               }}
             />
@@ -864,20 +864,20 @@ export default function Home() {
           </div>
           <div className="order-1 md:order-2">
             <span className="inline-block text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: GREEN_DARK }}>
-              {config?.about_eyebrow || 'QË PREJ 2019 • MADE IN ALBANIA'}
+              {config?.about_eyebrow || 'QIRA MAKINASH • MADE IN ALBANIA'}
             </span>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-5 leading-tight">
-              {config?.about_title || 'Ndërtuar për biznese që kërkojnë kontroll real.'}
+              {config?.about_title || 'Udheto pa shqetesime me Rent Parid.'}
             </h2>
             <div className="space-y-4 text-gray-700 leading-relaxed whitespace-pre-line">
               {config?.about_text ||
-                `Një sistem i vetëm për menaxhimin e shitjeve, stokut, financave dhe fiskalizimit. Më pak punë manuale – më shumë kontroll në kohë reale.
+                `Qira makinash e thjeshte, e sigurte dhe e shpejte ne te gjithe Shqiperine. Rezervo online ne pak minuta dhe merre makinen aty ku ke nevoje — ne aeroport, ne hotel ose ne zyren tone.
 
-Kush jemi: Parid Smart Solution ofron programe profesionale për fiskalizimin, kontabilitetin dhe manaxhimin e biznesit, të shoqëruara edhe me pajisje POS. Ndihmojmë bizneset të punojnë më thjeshtë, më shpejt dhe në përputhje me ligjin.
+Kush jemi: Rent Parid eshte agjensi vendase qiraje makinash me nje flote te perditesuar dhe stafe profesionale. Ofrojme makina ekonomike, familjare, SUV dhe automjete luksoze me cmime te qarta dhe pa surpriza.
 
-Misioni: T'u japim bizneseve mjete të thjeshta, të sakta dhe të ligjshme për të menaxhuar çdo proces ditor.
+Misioni: Te bejme udhetimin tuaj te sigurte dhe komod, me kushte transparente dhe sherbim te shpejte.
 
-Vizioni: Të jemi programi më i besueshëm i menaxhimit financiar dhe fiskal në Shqipëri.`}
+Vizioni: Te jemi zgjedhja e pare per qira makinash ne Shqiperi, e besuar njesoj nga turistet dhe bizneset vendase.`}
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-3">
               {config?.contact_phone && (
@@ -917,117 +917,10 @@ Vizioni: Të jemi programi më i besueshëm i menaxhimit financiar dhe fiskal n�
           style={{ background: `linear-gradient(135deg, ${GREEN} 0%, ${GREEN_DARK} 100%)` }}
         >
           <h3 className="text-2xl sm:text-3xl font-extrabold mb-2">Bashkohu me komunitetin tone</h3>
-          <p className="text-white/90 mb-6 max-w-xl mx-auto">Lajmet me te fundit, keshilla per biznesin dhe ofertat ekskluzive — direkt ne email.</p>
+          <p className="text-white/90 mb-6 max-w-xl mx-auto">Modelet me te reja te flotes, keshilla udhetimi dhe oferta sezonale per qira makinash — direkt ne email.</p>
           <NewsletterForm primary={GREEN_DARK} onToast={showToast} />
         </div>
       </section>
-
-      {/* Cart Drawer */}
-      {cartOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          <div className="flex-1 bg-black/40" onClick={() => setCartOpen(false)} />
-          <div className="w-full sm:max-w-sm bg-white text-gray-900 h-full flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b">
-              <h2 className="text-lg font-bold">Shporta juaj ({cartCount})</h2>
-              <button onClick={() => setCartOpen(false)} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-              {cart.length === 0 ? (
-                <p className="text-gray-600 text-center mt-10">Shporta juaj eshte bosh.</p>
-              ) : (
-                cart.map((item) => {
-                  const currency = config?.currency_symbol || 'Lek';
-                  const fixed = item.price.toFixed(2);
-                  const [intPart, decPart] = fixed.split('.');
-                  const hasDec = decPart !== '00';
-                  return (
-                    /* min-w-0 + truncate inside lets long product names
-                       shrink instead of pushing qty + delete off-screen.
-                       Image is a fixed 48×48 thumb — falls back to the
-                       tenant logo (NOT the barcode-as-text that was
-                       overflowing the row before). Name is bumped from
-                       text-sm to text-base/font-semibold; price uses the
-                       new "70 Lek" format with smaller grey currency. */
-                    <div key={item.id} className="flex items-center gap-3 min-w-0">
-                      <div className="shrink-0 w-12 h-12 rounded bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden">
-                        {(item.imageCount ?? 0) > 0 ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={`/api/products/${item.id}/image`}
-                            alt={item.name}
-                            loading="lazy"
-                            decoding="async"
-                            className="w-full h-full object-contain"
-                          />
-                        ) : (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src="/api/logo"
-                            alt=""
-                            aria-hidden="true"
-                            loading="lazy"
-                            className="w-3/4 h-3/4 object-contain opacity-40"
-                            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                          />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-base font-semibold text-gray-900 truncate" title={item.name}>{item.name}</p>
-                        <p className="text-sm font-bold text-gray-900 mt-0.5">
-                          {hasDec ? `${intPart}.${decPart}` : intPart}
-                          <span className="text-xs font-medium text-gray-500 ml-1">{currency}</span>
-                        </p>
-                      </div>
-                      <div className="shrink-0 flex items-center gap-1">
-                        <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-7 h-7 rounded border border-gray-300 bg-white text-sm text-gray-900 hover:bg-gray-100 font-semibold flex items-center justify-center">−</button>
-                        <span className="w-6 text-center text-sm font-medium">{item.qty}</span>
-                        <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-7 h-7 rounded border border-gray-300 bg-white text-sm text-gray-900 hover:bg-gray-100 font-semibold flex items-center justify-center">+</button>
-                      </div>
-                      <button onClick={() => removeFromCart(item.id)} className="shrink-0 text-red-500 hover:text-red-700 text-base" aria-label="Hiq">🗑</button>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-            {cart.length > 0 && (
-              <div className="px-5 py-4 border-t space-y-3">
-                <div className="flex justify-between font-semibold text-lg">
-                  <span>Totali</span>
-                  {(() => {
-                    const fixed = cartTotal.toFixed(2);
-                    const [intP, decP] = fixed.split('.');
-                    const hasDec = decP !== '00';
-                    return (
-                      <span>
-                        {hasDec ? `${intP}.${decP}` : intP}
-                        <span className="text-sm font-medium text-gray-500 ml-1">{config?.currency_symbol || 'Lek'}</span>
-                      </span>
-                    );
-                  })()}
-                </div>
-                <button
-                  onClick={async () => {
-                    const result = await doCheckout(cart);
-                    if (result === 'unauthorized') {
-                      try {
-                        localStorage.setItem('pendingCheckout', '1');
-                        localStorage.setItem('returnAfterLogin', window.location.pathname);
-                      } catch {}
-                      showToast("Ju lutem hyni per te vazhduar");
-                      setCartOpen(false);
-                      router.push("/auth");
-                    }
-                  }}
-                  className="w-full text-white py-3 rounded-full font-semibold transition"
-                  style={{ backgroundColor: GREEN }}
-                >
-                  Perfundo porosine
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Toast */}
       {toast && (
